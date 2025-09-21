@@ -4,9 +4,9 @@
    
 
 <!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>FreeGAN</title>
+<title>CodeSep</title>
 <meta name="generator" content="Jekyll v3.9.0">
-<meta property="og:title" content="FreeGAN">
+<meta property="og:title" content="CodeSep">
 <meta property="og:locale" content="en_US">
 <link rel="canonical" href="https://mkd-mkd.github.io/icassp2024/">
 <meta property="og:url" content="https://mkd-mkd.github.io/icassp2024/">
@@ -26,30 +26,31 @@
     </section>
 
     <section class="main-content">
-      <h1 id=""><center>Is GAN Necessary for Mel-Spectrogram-based Neural Vocoder? </center></h1>
+      <h1 id=""><center>CodeSep: Low-Bitrate Codec-Driven Speech Separation with Base-Token Disentanglement and Auxiliary-Token Serial Prediction </center></h1>
       <!-- <h1 id=""><center> Evaluation </center></h1> -->
       
-<center>Hui-Peng Du, Yang Ai, Rui-Chen Zheng, Ye-Xin Lu, and Zhen-Hua Ling </center>
-<!--<center> Hui-peng Du, Ye-Xin Lu, Yang Ai, Zhen-hua Ling</center>
+<center>Hui-Peng Du, Yang Ai, Xiao-Hang Jiang, Rui-Chen Zheng, Zhen-Hua Ling </center>
 <br>
 <center> National Engineering Research Center of Speech and Language Information Processing,</center>
-<center> University of Science and Technology of China, Hefei, P.R.China</center>-->
+<center> University of Science and Technology of China, Hefei, P.R.China</center>
 
 
 <h2 id="abstract">Abstract</h2>
-<p>Recently, mainstream mel-spectrogram-based neural vocoders, such as HiFi-GAN and BigVGAN, rely on generative adversarial networks (GANs) for high-fidelity speech generation.
-  However, the use of GANs can restrict training efficiency and model complexity. 
-  Therefore, this paper proposes FreeGAN, a novel vocoder designed to investigate whether GANs are truly necessary for mel-spectrogram-based neural vocoders. 
-  FreeGAN employs an amplitude-phase serial prediction framework, therefore eliminating the need for GAN-based training. It incorporates an amplitude prior input, a SNAKE-ConvNeXt v2 backbone, and a frequency-weighted anti-wrapping phase loss to compensate for any performance loss caused by the absence of GANs.
-  Experimental results confirm that the speech quality of FreeGAN is comparable to that of advanced GAN-based vocoders, while significantly improving training efficiency and reducing model complexity. 
-  Other explicit-phase-prediction-based neural vocoders can also work without GANs by leveraging our proposed methods. </p>
+<p>This paper targets a new scenario that integrates speech separation with speech compression, aiming to disentangle multiple speakers while producing discrete representations for efficient transmission or storage, with applications in online meetings and dialogue archiving. 
+  To address this scenario, we propose CodeSep, a codec-driven model that jointly performs speech separation and low-bitrate compression. 
+  CodeSep comprises a residual vector quantizer (RVQ)-based plain neural speech codec, a base-token disentanglement (BTD) module, and parallel auxiliary-token serial prediction (ATSP) modules. 
+  The BTD module disentangles mixed-speech mel-spectrograms into base tokens for each speaker, which are then refined by ATSP modules to serially predict auxiliary tokens, and finally, all tokens are decoded to reconstruct separated waveforms through the codec decoder. 
+  During training, the codec’s RVQ provides supervision with permutation-invariant and teacher-forcing-based cross-entropy losses. 
+  As only base tokens are transmitted or stored, CodeSep achieves low-bitrate compression. 
+  Experimental results show that CodeSep attains satisfactory separation performance at only 1 kbps compared with baseline methods. </p>
 
 <h2><p class="toc_title">Contents</p></h2>
 <div id="toc_container">
 <ul>
   <li><a href="#1">Model Architecture</a></li>
-  <li><a href="#2">Is GAN Necessary for the FreeGAN vocoder?</a></li>
-  <li><a href="#3">GAN is Necessary for Which Types of Vocoders?</a></li>
+  <li><a href="#2">Comparison at the Low-Bitrate Condition</a></li>
+  <li><a href="#3">Comparison against Higher-Bitrate Baselines</a></li>
+  <li><a href="#4">Ablation Studies</a></li>
 </ul>
 </div>
 
@@ -57,14 +58,13 @@
 <div>
   <br />
   <p style="text-align: center">
-    <img src="./fig1.png" width="1500" height="500"/>
+    <img src="./sepcodec.png" width="1500" height="500"/>
   </p>
   <p>
   <figcaption style="text-align:center;">
     </font>
     <font size=3>
-      Fig.1 Overview of the proposed FreeGAN vocoder and the strategies we proposed. The strategies we introduced are highlighted in red italics, 
-       including the use of pseudo-amplitude spectrum as a prior, SNAKE-ConvNeXt V2 blocks, and frequency-weighted anti-wrapping phase loss.
+      Fig.1 An overview of CodeSep with N = 4 as an example. The gray parts indicate modules absent during inference.
     </font>
   </figcaption><br><br>
   </p>
@@ -72,7 +72,7 @@
 
 
 
-<a name="2"><h2>Is GAN Necessary for the FreeGAN vocoder?</h2></a>
+<a name="2"><h2>Comparison at the Low-Bitrate Condition</h2></a>
 
 <p>
 </p>
@@ -80,11 +80,11 @@
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>Groud Truth</strong></th>
-      <th style="text-align: center"><strong>FreeGAN (proposed)</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o Prior</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o SNAKE</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o FWAWP</strong></th>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>Sepformer_1</strong></th>
+      <th style="text-align: center"><strong>Sepformer_2</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
     </tr>
   </thead>
   <tbody>
@@ -101,12 +101,10 @@
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>HiFi-GAN</strong></th>
-      <th style="text-align: center"><strong>BigVGAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet</strong></th>
-      <th style="text-align: center"><strong>Vocos</strong></th>
-      <th style="text-align: center"><strong>APNet2</strong></th>
-      <th style="text-align: center"><strong>FreeV</strong></th>
+      <th style="text-align: center"><strong>FCTS @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>FCTS @ 1kbps_2</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 1kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
@@ -115,8 +113,6 @@
       <td style="text-align: left"><audio src="./G/G_01.wav" controls="" preload=""></audio></td>
       <td style="text-align: left"><audio src="./H/H_01.wav" controls="" preload=""></audio></td>
       <td style="text-align: left"><audio src="./I/I_01.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./J/J_01.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./K/K_01.wav" controls="" preload=""></audio></td>
   </tbody>
 </table>
 <br>
@@ -125,11 +121,11 @@
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>Groud Truth</strong></th>
-      <th style="text-align: center"><strong>FreeGAN (proposed)</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o Prior</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o SNAKE</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o FWAWP</strong></th>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>Sepformer_1</strong></th>
+      <th style="text-align: center"><strong>Sepformer_2</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
     </tr>
   </thead>
   <tbody>
@@ -146,12 +142,10 @@
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>HiFi-GAN</strong></th>
-      <th style="text-align: center"><strong>BigVGAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet</strong></th>
-      <th style="text-align: center"><strong>Vocos</strong></th>
-      <th style="text-align: center"><strong>APNet2</strong></th>
-      <th style="text-align: center"><strong>FreeV</strong></th>
+      <th style="text-align: center"><strong>FCTS @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>FCTS @ 1kbps_2</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 1kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
@@ -160,8 +154,6 @@
       <td style="text-align: left"><audio src="./G/G_02.wav" controls="" preload=""></audio></td>
       <td style="text-align: left"><audio src="./H/H_02.wav" controls="" preload=""></audio></td>
       <td style="text-align: left"><audio src="./I/I_02.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./J/J_02.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./K/K_02.wav" controls="" preload=""></audio></td>
   </tbody>
 </table>
 <br>
@@ -170,11 +162,11 @@
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>Groud Truth</strong></th>
-      <th style="text-align: center"><strong>FreeGAN (proposed)</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o Prior</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o SNAKE</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o FWAWP</strong></th>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>Sepformer_1</strong></th>
+      <th style="text-align: center"><strong>Sepformer_2</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
     </tr>
   </thead>
   <tbody>
@@ -191,12 +183,10 @@
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>HiFi-GAN</strong></th>
-      <th style="text-align: center"><strong>BigVGAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet</strong></th>
-      <th style="text-align: center"><strong>Vocos</strong></th>
-      <th style="text-align: center"><strong>APNet2</strong></th>
-      <th style="text-align: center"><strong>FreeV</strong></th>
+      <th style="text-align: center"><strong>FCTS @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>FCTS @ 1kbps_2</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 1kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
@@ -205,8 +195,6 @@
       <td style="text-align: left"><audio src="./G/G_03.wav" controls="" preload=""></audio></td>
       <td style="text-align: left"><audio src="./H/H_03.wav" controls="" preload=""></audio></td>
       <td style="text-align: left"><audio src="./I/I_03.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./J/J_03.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./K/K_03.wav" controls="" preload=""></audio></td>
   </tbody>
 </table>
 <br>
@@ -215,11 +203,11 @@
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>Groud Truth</strong></th>
-      <th style="text-align: center"><strong>FreeGAN (proposed)</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o Prior</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o SNAKE</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o FWAWP</strong></th>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>Sepformer_1</strong></th>
+      <th style="text-align: center"><strong>Sepformer_2</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
     </tr>
   </thead>
   <tbody>
@@ -236,12 +224,10 @@
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>HiFi-GAN</strong></th>
-      <th style="text-align: center"><strong>BigVGAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet</strong></th>
-      <th style="text-align: center"><strong>Vocos</strong></th>
-      <th style="text-align: center"><strong>APNet2</strong></th>
-      <th style="text-align: center"><strong>FreeV</strong></th>
+      <th style="text-align: center"><strong>FCTS @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>FCTS @ 1kbps_2</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 1kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
@@ -250,8 +236,6 @@
       <td style="text-align: left"><audio src="./G/G_04.wav" controls="" preload=""></audio></td>
       <td style="text-align: left"><audio src="./H/H_04.wav" controls="" preload=""></audio></td>
       <td style="text-align: left"><audio src="./I/I_04.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./J/J_04.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./K/K_04.wav" controls="" preload=""></audio></td>
   </tbody>
 </table>
 <br>
@@ -260,11 +244,11 @@
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>Groud Truth</strong></th>
-      <th style="text-align: center"><strong>FreeGAN (proposed)</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o Prior</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o SNAKE</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o FWAWP</strong></th>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>Sepformer_1</strong></th>
+      <th style="text-align: center"><strong>Sepformer_2</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
     </tr>
   </thead>
   <tbody>
@@ -281,12 +265,10 @@
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>HiFi-GAN</strong></th>
-      <th style="text-align: center"><strong>BigVGAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet</strong></th>
-      <th style="text-align: center"><strong>Vocos</strong></th>
-      <th style="text-align: center"><strong>APNet2</strong></th>
-      <th style="text-align: center"><strong>FreeV</strong></th>
+      <th style="text-align: center"><strong>FCTS @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>FCTS @ 1kbps_2</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 1kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
@@ -295,8 +277,6 @@
       <td style="text-align: left"><audio src="./G/G_05.wav" controls="" preload=""></audio></td>
       <td style="text-align: left"><audio src="./H/H_05.wav" controls="" preload=""></audio></td>
       <td style="text-align: left"><audio src="./I/I_05.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./J/J_05.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./K/K_05.wav" controls="" preload=""></audio></td>
   </tbody>
 </table>
 <br>
@@ -305,11 +285,11 @@
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>Groud Truth</strong></th>
-      <th style="text-align: center"><strong>FreeGAN (proposed)</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o Prior</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o SNAKE</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o FWAWP</strong></th>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>Sepformer_1</strong></th>
+      <th style="text-align: center"><strong>Sepformer_2</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
     </tr>
   </thead>
   <tbody>
@@ -326,12 +306,10 @@
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>HiFi-GAN</strong></th>
-      <th style="text-align: center"><strong>BigVGAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet</strong></th>
-      <th style="text-align: center"><strong>Vocos</strong></th>
-      <th style="text-align: center"><strong>APNet2</strong></th>
-      <th style="text-align: center"><strong>FreeV</strong></th>
+      <th style="text-align: center"><strong>FCTS @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>FCTS @ 1kbps_2</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 1kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
@@ -340,451 +318,417 @@
       <td style="text-align: left"><audio src="./G/G_06.wav" controls="" preload=""></audio></td>
       <td style="text-align: left"><audio src="./H/H_06.wav" controls="" preload=""></audio></td>
       <td style="text-align: left"><audio src="./I/I_06.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./J/J_06.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./K/K_06.wav" controls="" preload=""></audio></td>
   </tbody>
 </table>
 <br>
 <br>
-<h3>Sample 7</h3>
-<table>
-  <thead>
-    <tr>
-      <th style="text-align: center"><strong>Groud Truth</strong></th>
-      <th style="text-align: center"><strong>FreeGAN (proposed)</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o Prior</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o SNAKE</strong></th>
-      <th style="text-align: center"><strong>FreeGAN w/o FWAWP</strong></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: left"><audio src="./A/A_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./B/B_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./C/C_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./D/D_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./E/E_07.wav" controls="" preload=""></audio></td>
-  </tbody>
-</table>
-<br>
-<br>
-<table>
-  <thead>
-    <tr>
-      <th style="text-align: center"><strong>HiFi-GAN</strong></th>
-      <th style="text-align: center"><strong>BigVGAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet</strong></th>
-      <th style="text-align: center"><strong>Vocos</strong></th>
-      <th style="text-align: center"><strong>APNet2</strong></th>
-      <th style="text-align: center"><strong>FreeV</strong></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: left"><audio src="./F/F_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./G/G_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./H/H_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./I/I_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./J/J_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./K/K_07.wav" controls="" preload=""></audio></td>
-  </tbody>
-</table>
-<br>
-<br>
-<strong> w/o GAN: GAN-free versions.
-  <br>
-  * w/o GAN: GAN-free versions with our proposed
-  improvement strategies. </strong>
-<a name="3"><h2>GAN is Necessary for Which Types of Vocoders?</h2></a>
+<a name="3"><h2>Comparison against Higher-Bitrate Baselines</h2></a>
 <h3>Sample 1</h3>
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>HiFi-GAN</strong></th>
-      <th style="text-align: center"><strong>HiFi-GAN w/o GAN</strong></th>
-      <th style="text-align: center"><strong>HiFi-GAN* w/o GAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet w/o GAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet* w/o GAN</strong></th>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 2kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 2kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: left"><audio src="./abx/A/A_01.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/B/B_01.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/C/C_01.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/D/D_01.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/E/E_01.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/F/F_01.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./A/A_01.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./B/B_01.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./C/C_01.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./J/J_01.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./K/K_01.wav" controls="" preload=""></audio></td>
   </tbody>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>Vocos</strong></th>
-      <th style="text-align: center"><strong>Vocos w/o GAN</strong></th>
-      <th style="text-align: center"><strong>Vocos* w/o GAN</strong></th>
-      <th style="text-align: center"><strong>APNet2</strong></th>
-      <th style="text-align: center"><strong>APNet2 w/o GAN</strong></th>
-      <th style="text-align: center"><strong>APNet2* w/o GAN</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 4kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 4kbps_2</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 8kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 8kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: left"><audio src="./abx/G/G_01.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/H/H_01.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/I/I_01.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/J/J_01.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/K/K_01.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/L/L_01.wav" controls="" preload=""></audio></td>
-  </tbody>
-  <thead>
-    <tr>
-      <th style="text-align: center"><strong>FreeV</strong></th>
-      <th style="text-align: center"><strong>FreeV w/o GAN</strong></th>
-      <th style="text-align: center"><strong>FreeV* w/o GAN</strong></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: left"><audio src="./abx/M/M_01.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/N/N_01.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/O/O_01.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./L/L_01.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./M/M_01.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./N/N_01.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./O/O_01.wav" controls="" preload=""></audio></td>
   </tbody>
 </table>
-<br>
 <br>
 <h3>Sample 2</h3>
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>HiFi-GAN</strong></th>
-      <th style="text-align: center"><strong>HiFi-GAN w/o GAN</strong></th>
-      <th style="text-align: center"><strong>HiFi-GAN* w/o GAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet w/o GAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet* w/o GAN</strong></th>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 2kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 2kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: left"><audio src="./abx/A/A_02.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/B/B_02.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/C/C_02.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/D/D_02.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/E/E_02.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/F/F_02.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./A/A_02.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./B/B_02.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./C/C_02.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./J/J_02.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./K/K_02.wav" controls="" preload=""></audio></td>
   </tbody>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>Vocos</strong></th>
-      <th style="text-align: center"><strong>Vocos w/o GAN</strong></th>
-      <th style="text-align: center"><strong>Vocos* w/o GAN</strong></th>
-      <th style="text-align: center"><strong>APNet2</strong></th>
-      <th style="text-align: center"><strong>APNet2 w/o GAN</strong></th>
-      <th style="text-align: center"><strong>APNet2* w/o GAN</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 4kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 4kbps_2</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 8kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 8kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: left"><audio src="./abx/G/G_02.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/H/H_02.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/I/I_02.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/J/J_02.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/K/K_02.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/L/L_02.wav" controls="" preload=""></audio></td>
-  </tbody>
-  <thead>
-    <tr>
-      <th style="text-align: center"><strong>FreeV</strong></th>
-      <th style="text-align: center"><strong>FreeV w/o GAN</strong></th>
-      <th style="text-align: center"><strong>FreeV* w/o GAN</strong></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: left"><audio src="./abx/M/M_02.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/N/N_02.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/O/O_02.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./L/L_02.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./M/M_02.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./N/N_02.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./O/O_02.wav" controls="" preload=""></audio></td>
   </tbody>
 </table>
-<br>
 <br>
 <h3>Sample 3</h3>
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>HiFi-GAN</strong></th>
-      <th style="text-align: center"><strong>HiFi-GAN w/o GAN</strong></th>
-      <th style="text-align: center"><strong>HiFi-GAN* w/o GAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet w/o GAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet* w/o GAN</strong></th>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 2kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 2kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: left"><audio src="./abx/A/A_03.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/B/B_03.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/C/C_03.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/D/D_03.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/E/E_03.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/F/F_03.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./A/A_03.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./B/B_03.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./C/C_03.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./J/J_03.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./K/K_03.wav" controls="" preload=""></audio></td>
   </tbody>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>Vocos</strong></th>
-      <th style="text-align: center"><strong>Vocos w/o GAN</strong></th>
-      <th style="text-align: center"><strong>Vocos* w/o GAN</strong></th>
-      <th style="text-align: center"><strong>APNet2</strong></th>
-      <th style="text-align: center"><strong>APNet2 w/o GAN</strong></th>
-      <th style="text-align: center"><strong>APNet2* w/o GAN</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 4kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 4kbps_2</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 8kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 8kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: left"><audio src="./abx/G/G_03.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/H/H_03.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/I/I_03.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/J/J_03.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/K/K_03.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/L/L_03.wav" controls="" preload=""></audio></td>
-  </tbody>
-  <thead>
-    <tr>
-      <th style="text-align: center"><strong>FreeV</strong></th>
-      <th style="text-align: center"><strong>FreeV w/o GAN</strong></th>
-      <th style="text-align: center"><strong>FreeV* w/o GAN</strong></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: left"><audio src="./abx/M/M_03.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/N/N_03.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/O/O_03.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./L/L_03.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./M/M_03.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./N/N_03.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./O/O_03.wav" controls="" preload=""></audio></td>
   </tbody>
 </table>
-<br>
 <br>
 <h3>Sample 4</h3>
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>HiFi-GAN</strong></th>
-      <th style="text-align: center"><strong>HiFi-GAN w/o GAN</strong></th>
-      <th style="text-align: center"><strong>HiFi-GAN* w/o GAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet w/o GAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet* w/o GAN</strong></th>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 2kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 2kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: left"><audio src="./abx/A/A_04.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/B/B_04.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/C/C_04.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/D/D_04.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/E/E_04.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/F/F_04.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./A/A_04.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./B/B_04.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./C/C_04.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./J/J_04.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./K/K_04.wav" controls="" preload=""></audio></td>
   </tbody>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>Vocos</strong></th>
-      <th style="text-align: center"><strong>Vocos w/o GAN</strong></th>
-      <th style="text-align: center"><strong>Vocos* w/o GAN</strong></th>
-      <th style="text-align: center"><strong>APNet2</strong></th>
-      <th style="text-align: center"><strong>APNet2 w/o GAN</strong></th>
-      <th style="text-align: center"><strong>APNet2* w/o GAN</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 4kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 4kbps_2</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 8kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 8kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: left"><audio src="./abx/G/G_04.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/H/H_04.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/I/I_04.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/J/J_04.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/K/K_04.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/L/L_04.wav" controls="" preload=""></audio></td>
-  </tbody>
-  <thead>
-    <tr>
-      <th style="text-align: center"><strong>FreeV</strong></th>
-      <th style="text-align: center"><strong>FreeV w/o GAN</strong></th>
-      <th style="text-align: center"><strong>FreeV* w/o GAN</strong></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: left"><audio src="./abx/M/M_04.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/N/N_04.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/O/O_04.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./L/L_04.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./M/M_04.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./N/N_04.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./O/O_04.wav" controls="" preload=""></audio></td>
   </tbody>
 </table>
-<br>
 <br>
 <h3>Sample 5</h3>
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>HiFi-GAN</strong></th>
-      <th style="text-align: center"><strong>HiFi-GAN w/o GAN</strong></th>
-      <th style="text-align: center"><strong>HiFi-GAN* w/o GAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet w/o GAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet* w/o GAN</strong></th>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 2kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 2kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: left"><audio src="./abx/A/A_05.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/B/B_05.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/C/C_05.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/D/D_05.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/E/E_05.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/F/F_05.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./A/A_05.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./B/B_05.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./C/C_05.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./J/J_05.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./K/K_05.wav" controls="" preload=""></audio></td>
   </tbody>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>Vocos</strong></th>
-      <th style="text-align: center"><strong>Vocos w/o GAN</strong></th>
-      <th style="text-align: center"><strong>Vocos* w/o GAN</strong></th>
-      <th style="text-align: center"><strong>APNet2</strong></th>
-      <th style="text-align: center"><strong>APNet2 w/o GAN</strong></th>
-      <th style="text-align: center"><strong>APNet2* w/o GAN</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 4kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 4kbps_2</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 8kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 8kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: left"><audio src="./abx/G/G_05.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/H/H_05.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/I/I_05.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/J/J_05.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/K/K_05.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/L/L_05.wav" controls="" preload=""></audio></td>
-  </tbody>
-  <thead>
-    <tr>
-      <th style="text-align: center"><strong>FreeV</strong></th>
-      <th style="text-align: center"><strong>FreeV w/o GAN</strong></th>
-      <th style="text-align: center"><strong>FreeV* w/o GAN</strong></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: left"><audio src="./abx/M/M_05.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/N/N_05.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/O/O_05.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./L/L_05.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./M/M_05.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./N/N_05.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./O/O_05.wav" controls="" preload=""></audio></td>
   </tbody>
 </table>
-<br>
 <br>
 <h3>Sample 6</h3>
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>HiFi-GAN</strong></th>
-      <th style="text-align: center"><strong>HiFi-GAN w/o GAN</strong></th>
-      <th style="text-align: center"><strong>HiFi-GAN* w/o GAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet w/o GAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet* w/o GAN</strong></th>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 2kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 2kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: left"><audio src="./abx/A/A_06.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/B/B_06.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/C/C_06.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/D/D_06.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/E/E_06.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/F/F_06.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./A/A_06.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./B/B_06.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./C/C_06.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./J/J_06.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./K/K_06.wav" controls="" preload=""></audio></td>
   </tbody>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>Vocos</strong></th>
-      <th style="text-align: center"><strong>Vocos w/o GAN</strong></th>
-      <th style="text-align: center"><strong>Vocos* w/o GAN</strong></th>
-      <th style="text-align: center"><strong>APNet2</strong></th>
-      <th style="text-align: center"><strong>APNet2 w/o GAN</strong></th>
-      <th style="text-align: center"><strong>APNet2* w/o GAN</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 4kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 4kbps_2</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 8kbps_1</strong></th>
+      <th style="text-align: center"><strong>FSTC @ 8kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: left"><audio src="./abx/G/G_06.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/H/H_06.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/I/I_06.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/J/J_06.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/K/K_06.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/L/L_06.wav" controls="" preload=""></audio></td>
-  </tbody>
-  <thead>
-    <tr>
-      <th style="text-align: center"><strong>FreeV</strong></th>
-      <th style="text-align: center"><strong>FreeV w/o GAN</strong></th>
-      <th style="text-align: center"><strong>FreeV* w/o GAN</strong></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: left"><audio src="./abx/M/M_06.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/N/N_06.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/O/O_06.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./L/L_06.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./M/M_06.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./N/N_06.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./O/O_06.wav" controls="" preload=""></audio></td>
   </tbody>
 </table>
 <br>
-<br>
-<h3>Sample 7</h3>
+<a name="4"><h2>Ablation Studies</h2></a>
+<h3>Sample 1</h3>
 <table>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>HiFi-GAN</strong></th>
-      <th style="text-align: center"><strong>HiFi-GAN w/o GAN</strong></th>
-      <th style="text-align: center"><strong>HiFi-GAN* w/o GAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet w/o GAN</strong></th>
-      <th style="text-align: center"><strong>iSTFTNet* w/o GAN</strong></th>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: left"><audio src="./abx/A/A_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/B/B_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/C/C_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/D/D_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/E/E_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/F/F_07.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src=".A//A_01.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./B/B_01.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./C/C_01.wav" controls="" preload=""></audio></td>
   </tbody>
   <thead>
     <tr>
-      <th style="text-align: center"><strong>Vocos</strong></th>
-      <th style="text-align: center"><strong>Vocos w/o GAN</strong></th>
-      <th style="text-align: center"><strong>Vocos* w/o GAN</strong></th>
-      <th style="text-align: center"><strong>APNet2</strong></th>
-      <th style="text-align: center"><strong>APNet2 w/o GAN</strong></th>
-      <th style="text-align: center"><strong>APNet2* w/o GAN</strong></th>
+      <th style="text-align: center"><strong>w/o ACBG @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>w/o ACBG @ 1kbps_2</strong></th>
+      <th style="text-align: center"><strong>w/o TF @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>w/o TF @ 1kbps_2</strong></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: left"><audio src="./abx/G/G_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/H/H_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/I/I_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/J/J_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/K/K_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/L/L_07.wav" controls="" preload=""></audio></td>
-  </tbody>
-  <thead>
-    <tr>
-      <th style="text-align: center"><strong>FreeV</strong></th>
-      <th style="text-align: center"><strong>FreeV w/o GAN</strong></th>
-      <th style="text-align: center"><strong>FreeV* w/o GAN</strong></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: left"><audio src="./abx/M/M_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/N/N_07.wav" controls="" preload=""></audio></td>
-      <td style="text-align: left"><audio src="./abx/O/O_07.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./P/P_01.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./Q/Q_01.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./R/R_01.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./S/S_01.wav" controls="" preload=""></audio></td>
   </tbody>
 </table>
 <br>
+<h3>Sample 2</h3>
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><audio src=".A//A_02.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./B/B_02.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./C/C_02.wav" controls="" preload=""></audio></td>
+  </tbody>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>w/o ACBG @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>w/o ACBG @ 1kbps_2</strong></th>
+      <th style="text-align: center"><strong>w/o TF @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>w/o TF @ 1kbps_2</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><audio src="./P/P_02.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./Q/Q_02.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./R/R_02.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./S/S_02.wav" controls="" preload=""></audio></td>
+  </tbody>
+</table>
+<br>
+<h3>Sample 3</h3>
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><audio src=".A//A_03.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./B/B_03.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./C/C_03.wav" controls="" preload=""></audio></td>
+  </tbody>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>w/o ACBG @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>w/o ACBG @ 1kbps_2</strong></th>
+      <th style="text-align: center"><strong>w/o TF @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>w/o TF @ 1kbps_2</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><audio src="./P/P_03.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./Q/Q_03.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./R/R_03.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./S/S_03.wav" controls="" preload=""></audio></td>
+  </tbody>
+</table>
+<br>
+<h3>Sample 4</h3>
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><audio src=".A//A_04.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./B/B_04.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./C/C_04.wav" controls="" preload=""></audio></td>
+  </tbody>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>w/o ACBG @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>w/o ACBG @ 1kbps_2</strong></th>
+      <th style="text-align: center"><strong>w/o TF @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>w/o TF @ 1kbps_2</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><audio src="./P/P_04.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./Q/Q_04.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./R/R_04.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./S/S_04.wav" controls="" preload=""></audio></td>
+  </tbody>
+</table>
+<br>
+<h3>Sample 5</h3>
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><audio src=".A//A_05.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./B/B_05.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./C/C_05.wav" controls="" preload=""></audio></td>
+  </tbody>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>w/o ACBG @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>w/o ACBG @ 1kbps_2</strong></th>
+      <th style="text-align: center"><strong>w/o TF @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>w/o TF @ 1kbps_2</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><audio src="./P/P_05.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./Q/Q_05.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./R/R_05.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./S/S_05.wav" controls="" preload=""></audio></td>
+  </tbody>
+</table>
+<br>
+<h3>Sample 6</h3>
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>Fixed waveform</strong></th>
+      <th style="text-align: center"><strong>CodeSep_1 (proposed)</strong></th>
+      <th style="text-align: center"><strong>CodeSep_2 (proposed)</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><audio src=".A//A_06.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./B/B_06.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./C/C_06.wav" controls="" preload=""></audio></td>
+  </tbody>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>w/o ACBG @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>w/o ACBG @ 1kbps_2</strong></th>
+      <th style="text-align: center"><strong>w/o TF @ 1kbps_1</strong></th>
+      <th style="text-align: center"><strong>w/o TF @ 1kbps_2</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><audio src="./P/P_06.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./Q/Q_06.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./R/R_06.wav" controls="" preload=""></audio></td>
+      <td style="text-align: left"><audio src="./S/S_06.wav" controls="" preload=""></audio></td>
+  </tbody>
+</table>
 <br>
